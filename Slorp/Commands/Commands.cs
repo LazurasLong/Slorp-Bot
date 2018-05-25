@@ -1,21 +1,22 @@
-﻿using DSharpPlus;
-using DSharpPlus.CommandsNext;
+﻿using DSharpPlus.CommandsNext;
 using DSharpPlus.CommandsNext.Attributes;
 using DSharpPlus.Entities;
-using System;
+using Slorp.Modules;
 using System.Threading.Tasks;
 
-namespace Slorpbot
+
+namespace Slorp.Commands
 {
-    public class Commands
+    public class CoreCommands
     {
-        [Command("ping")] // let's define this method as a command
-        [Description("Example ping command")] // this will be displayed to tell users what this command does when they invoke help
-        [Aliases("pong")] // alternative names for the command
-        public async Task Ping(CommandContext ctx) // this command takes no arguments
+        DiscordColor slorpColor = new DiscordColor("#ffd28b");
+
+        [Command("ping")]
+        [Description("Measures Slorp's latency")]
+        [Aliases("pong")]
+        public async Task Ping(CommandContext ctx) // CommandContext is context the command came from (User, Channel, Server)
         {
-            // let's trigger a typing indicator to let
-            // users know we're working
+            // triggers a typing indicator in the channel the command came from
             await ctx.TriggerTypingAsync();
 
             // let's make the message a bit more colourful
@@ -25,8 +26,9 @@ namespace Slorpbot
             await ctx.RespondAsync($"{emoji} Pong! {ctx.Client.Ping}ms");
         }
 
-        // Command that rolls dice
-        [Command("roll"), Description("Rolls any number of any-sided dice, for example 3d8 will roll an 8 sided die 3 times."), Aliases("r")]
+        [Command("roll")]
+        [Description("Rolls sets of dice")]
+        [Aliases("r")]
         public async Task Roll(CommandContext ctx, [RemainingText] string _dice)
         {
             await ctx.TriggerTypingAsync();
@@ -37,16 +39,29 @@ namespace Slorpbot
             await ctx.RespondAsync(embed: embed.Build());
         }
 
-        [Command("rip"), Description("Pay your respects"), Aliases("F")]
-        public async Task Roll(CommandContext ctx, DiscordMember member, [RemainingText] string message)
+        [Command("rip")]
+        [Description("Pay your respects")]
+        [Aliases("f")]
+        public async Task Rip(
+            CommandContext ctx,
+            [Description("Member who died, can be a nickname or a @mention")] DiscordMember member,
+            [RemainingText, Description("Leave an epitaph?")] string message = ""
+            )
         {
             await ctx.TriggerTypingAsync();
 
             var embed = new DiscordEmbedBuilder
             {
-                Title = "F",
-                Description = $""
+                Title = $":skull: {member.DisplayName} died :skull:",
+                Description = $"Here lies {member.Mention}",
+                Color = slorpColor
             };
+
+            if (message != "") embed.AddField("In Memoriam", message);
+
+            await ctx.RespondAsync(embed: embed.Build());
+
+            await ctx.Message.DeleteAsync(); // Deletes the message that triggered this command.
         }
     }
 }

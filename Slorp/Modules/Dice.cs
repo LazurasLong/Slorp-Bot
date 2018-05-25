@@ -1,5 +1,4 @@
-﻿using DSharpPlus;
-using DSharpPlus.CommandsNext;
+﻿using DSharpPlus.CommandsNext;
 using DSharpPlus.Entities;
 using System;
 using System.Collections.Generic;
@@ -7,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Slorpbot
+namespace Slorp.Modules
 {
     public class Dice
     {
@@ -50,26 +49,53 @@ namespace Slorpbot
                 results.Add(_dSets[i].dResult.Total.ToString());
         }
 
-        public DiscordEmbed EmbedBuilder(CommandContext ctx)
+        private DiscordEmbed EmbedBuilder(CommandContext ctx)
         {
             var messageBuilder = new StringBuilder();
-            var emoji = DiscordEmoji.FromName(ctx.Client, ":game_die:");
 
             for (int i = 0; i < results.Count; i++)
             {
-                string mod = "";
+                string mod = string.Empty;
+                int moddedTotal = _dSets[i].dResult.Total + _dSets[i].Modifier;
 
+                // Sets mod string if mod != 0
                 if (_dSets[i].Modifier == 0) mod = "";
                 else if (_dSets[i].Modifier > 0) mod = $"+{_dSets[i].Modifier.ToString()}";
                 else mod = _dSets[i].Modifier.ToString();
 
-                messageBuilder.AppendLine(results.Count == 1 ? results[i] + mod : $"Set {i + 1}: " + results[i] + mod);
+                messageBuilder.Append("("); // Start-of-set bracket
+
+                // Adds each roll to messageBuilder, with a comma if theres another roll to add
+                for (int j = 0; j < _dSets[i].dResult.results.Count; j++)
+                {
+                    if (j + 1 < _dSets[i].dResult.results.Count)
+                    {
+                        messageBuilder.Append(_dSets[i].dResult.results[j].Item2.ToString() + ", ");
+                    }
+                    else messageBuilder.Append(_dSets[i].dResult.results[j].Item2.ToString());
+                }
+
+                messageBuilder.Append(")"); // End-of-set bracket
+
+                messageBuilder.Append(mod + $"  Total: {moddedTotal}");
+
+                // if 1d20 is rolled, checks for critical success/failure.
+                if (_dSets[i].DiceNum == 1 && _dSets[i].DiceType == 20 && _dSets[i].dResult.Total == 20)
+                {
+                    messageBuilder.Append("  Critical success!");
+                }
+                else if (_dSets[i].DiceNum == 1 && _dSets[i].DiceType == 20 && _dSets[i].dResult.Total == 1)
+                {
+                    messageBuilder.Append("  Critical failure!");
+                }
+
+                messageBuilder.Append("\n");
             }
 
             var embedBuilder = new DiscordEmbedBuilder
             {
                 Color = new DiscordColor("#ea596e"),
-                Title = results.Count == 1 ? $"Your roll {emoji}" : $"Your rolls {emoji}",
+                Title = results.Count == 1 ? $"Your roll :game_die:" : $"Your rolls :game_die:",
                 Description = messageBuilder.ToString().Replace("\r\n", "\n"),
             };
             return embedBuilder.Build();
@@ -84,6 +110,8 @@ namespace Slorpbot
 
         public Results dResult = new Results();
 
+        public int DiceNum { get => _diceNum; }
+        public int DiceType { get => _diceType; }
         public int Modifier { get => _modifier; }
 
         private static readonly Random random = new Random();
@@ -104,7 +132,7 @@ namespace Slorpbot
                 // Generates a random number between 1 and the number of sides of the die
                 nRnd = random.Next(1, _diceType + 1);
                 // Adds the random number to the result list
-                dResult.results.Add(new Tuple<int, int>(i + 1, nRnd));
+                dResult.results.Add(new Tuple<int, int>(_diceType, nRnd));
             }
         }
     }

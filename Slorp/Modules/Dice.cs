@@ -20,7 +20,7 @@ namespace Slorp.Modules
             ValidateInput();
             Run();
 
-            return EmbedBuilder(ctx);
+            return EmbedBuilder();
         }
 
         private void ValidateInput()
@@ -49,7 +49,7 @@ namespace Slorp.Modules
                 results.Add(_dSets[i].dResult.Total.ToString());
         }
 
-        private DiscordEmbed EmbedBuilder(CommandContext ctx)
+        private DiscordEmbed EmbedBuilder()
         {
             var messageBuilder = new StringBuilder();
 

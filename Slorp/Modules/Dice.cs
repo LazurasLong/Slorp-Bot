@@ -28,14 +28,14 @@ namespace Slorp.Modules
             string[] sets = _input.Split(';');
             foreach (string set in sets)
             {
-                int dNum, dType, mod;
+                int[] diceSet = new int[3];
                 Match RegexMatch = Regex.Match(set, @"^(\d+)d(\d+)(-?\+?\d+)?$");
 
-                dNum = Int32.Parse(RegexMatch.Groups[1].Value);
-                dType = Int32.Parse(RegexMatch.Groups[2].Value);
-                mod = string.IsNullOrEmpty(RegexMatch.Groups[3].Value) ? 0 : Int32.Parse(RegexMatch.Groups[3].Value);
+                diceSet[0] = Int32.Parse(RegexMatch.Groups[1].Value);
+                diceSet[1] = Int32.Parse(RegexMatch.Groups[2].Value);
+                diceSet[2] = string.IsNullOrEmpty(RegexMatch.Groups[3].Value) ? 0 : Int32.Parse(RegexMatch.Groups[3].Value);
 
-                _dSets.Add(new DSet(dNum, dType, mod));
+                _dSets.Add(new DSet(diceSet));
             }
         }
 
@@ -104,35 +104,31 @@ namespace Slorp.Modules
 
     class DSet
     {
-        private int _diceNum;
-        private int _diceType;
-        private int _modifier;
+        private int[] _rollSet = new int[3];
+
+        public int DiceNum { get => _rollSet[0]; }
+        public int DiceType { get => _rollSet[1]; }
+        public int Modifier { get => _rollSet[2]; }
 
         public Results dResult = new Results();
 
-        public int DiceNum { get => _diceNum; }
-        public int DiceType { get => _diceType; }
-        public int Modifier { get => _modifier; }
-
         private static readonly Random random = new Random();
 
-        public DSet(int diceNum, int diceType, int modifier)
+        public DSet(int[] diceSet)
         {
-            _diceNum = diceNum;
-            _diceType = diceType;
-            _modifier = modifier;
+            _rollSet = diceSet;
         }
 
         public void Roll()
         {
             int nRnd = 0;
             // Loops for each die
-            for (int i = 0; i < _diceNum; i++)
+            for (int i = 0; i < _rollSet[0]; i++)
             {
                 // Generates a random number between 1 and the number of sides of the die
-                nRnd = random.Next(1, _diceType + 1);
+                nRnd = random.Next(1, _rollSet[1] + 1);
                 // Adds the random number to the result list
-                dResult.results.Add(new Tuple<int, int>(_diceType, nRnd));
+                dResult.results.Add(new Tuple<int, int>(_rollSet[1], nRnd));
             }
         }
     }

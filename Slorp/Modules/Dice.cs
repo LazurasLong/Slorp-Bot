@@ -14,7 +14,7 @@ namespace Slorp.Modules
         private List<DSet> _dSets = new List<DSet>();
         private List<string> results = new List<string>();
 
-        public DiscordEmbed DRoll(string input, CommandContext ctx)
+        public DiscordEmbed DRoll(string input)
         {
             _input = input;
             ValidateInput();

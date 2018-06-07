@@ -40,8 +40,6 @@ namespace Slorp.Modules
 
         private void Run()
         {
-            int[] setTotal = new int[_dSets.Count];
-
             foreach (var d in _dSets) d.Roll();
 
             for (int i = 0; i < _dSets.Count; i++)

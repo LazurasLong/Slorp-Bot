@@ -59,9 +59,12 @@ namespace Slorp.Modules
                 int moddedTotal = _dSets[i].dResult.Total + _dSets[i].Modifier;
 
                 // Sets mod string if mod != 0
-                if (_dSets[i].Modifier == 0) mod = "";
-                else if (_dSets[i].Modifier > 0) mod = $"+{_dSets[i].Modifier.ToString()}";
-                else mod = _dSets[i].Modifier.ToString();
+                if (_dSets[i].Modifier == 0)
+                    mod = string.Empty;
+                else if (_dSets[i].Modifier > 0)
+                    mod = $"+{_dSets[i].Modifier.ToString()}";
+                else
+                    mod = _dSets[i].Modifier.ToString();
 
                 messageBuilder.Append("("); // Start-of-set bracket
 
@@ -81,13 +84,9 @@ namespace Slorp.Modules
 
                 // if 1d20 is rolled, checks for critical success/failure.
                 if (_dSets[i].DiceNum == 1 && _dSets[i].DiceType == 20 && _dSets[i].dResult.Total == 20)
-                {
                     messageBuilder.Append("  Critical success!");
-                }
                 else if (_dSets[i].DiceNum == 1 && _dSets[i].DiceType == 20 && _dSets[i].dResult.Total == 1)
-                {
                     messageBuilder.Append("  Critical failure!");
-                }
 
                 messageBuilder.Append("\n");
             }

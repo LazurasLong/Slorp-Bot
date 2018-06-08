@@ -63,19 +63,7 @@ namespace Slorp.Modules
                 else
                     mod = _dSets[i].Modifier.ToString();
 
-                messageBuilder.Append("("); // Start-of-set bracket
-
-                // Adds each roll to messageBuilder, with a comma if theres another roll to add
-                for (int j = 0; j < _dSets[i].dResult.results.Count; j++)
-                {
-                    if (j + 1 < _dSets[i].dResult.results.Count)
-                    {
-                        messageBuilder.Append(_dSets[i].dResult.results[j].Item2.ToString() + ", ");
-                    }
-                    else messageBuilder.Append(_dSets[i].dResult.results[j].Item2.ToString());
-                }
-
-                messageBuilder.Append(")"); // End-of-set bracket
+                messageBuilder.Append(GetSetResults(i));
 
                 messageBuilder.Append(mod + $"  Total: {moddedTotal}");
 
@@ -95,6 +83,26 @@ namespace Slorp.Modules
                 Description = messageBuilder.ToString().Replace("\r\n", "\n"),
             };
             return embedBuilder.Build();
+        }
+
+        private string GetSetResults(int i)
+        {
+            string _result = string.Empty;
+
+            if (_dSets[i].dResult.results.Count > 1)
+            {
+                _result += "[";
+
+                for (int j = 0; j < _dSets[i].dResult.results.Count; j++)
+                    _result += _dSets[i].dResult.results.Count > j + 1 ?
+                        _dSets[i].dResult.results[j].Item2.ToString() + ", " : _dSets[i].dResult.results[j].Item2.ToString();
+
+                _result += "]";
+            }
+            else
+                _result += _dSets[i].dResult.results[0].Item2.ToString();
+
+            return _result;
         }
     }
 

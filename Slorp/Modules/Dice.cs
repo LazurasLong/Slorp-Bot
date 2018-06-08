@@ -1,5 +1,4 @@
-﻿using DSharpPlus.CommandsNext;
-using DSharpPlus.Entities;
+﻿using DSharpPlus.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,13 +13,13 @@ namespace Slorp.Modules
         private List<DSet> _dSets = new List<DSet>();
         private List<string> results = new List<string>();
 
-        public DiscordEmbed DRoll(string input, CommandContext ctx)
+        public DiscordEmbed DRoll(string input)
         {
             _input = input;
             ValidateInput();
             Run();
 
-            return EmbedBuilder(ctx);
+            return EmbedBuilder();
         }
 
         private void ValidateInput()
@@ -28,28 +27,26 @@ namespace Slorp.Modules
             string[] sets = _input.Split(';');
             foreach (string set in sets)
             {
-                int dNum, dType, mod;
+                int[] diceSet = new int[3];
                 Match RegexMatch = Regex.Match(set, @"^(\d+)d(\d+)(-?\+?\d+)?$");
 
-                dNum = Int32.Parse(RegexMatch.Groups[1].Value);
-                dType = Int32.Parse(RegexMatch.Groups[2].Value);
-                mod = string.IsNullOrEmpty(RegexMatch.Groups[3].Value) ? 0 : Int32.Parse(RegexMatch.Groups[3].Value);
+                diceSet[0] = Int32.Parse(RegexMatch.Groups[1].Value);
+                diceSet[1] = Int32.Parse(RegexMatch.Groups[2].Value);
+                diceSet[2] = string.IsNullOrEmpty(RegexMatch.Groups[3].Value) ? 0 : Int32.Parse(RegexMatch.Groups[3].Value);
 
-                _dSets.Add(new DSet(dNum, dType, mod));
+                _dSets.Add(new DSet(diceSet));
             }
         }
 
         private void Run()
         {
-            int[] setTotal = new int[_dSets.Count];
-
             foreach (var d in _dSets) d.Roll();
 
             for (int i = 0; i < _dSets.Count; i++)
                 results.Add(_dSets[i].dResult.Total.ToString());
         }
 
-        private DiscordEmbed EmbedBuilder(CommandContext ctx)
+        private DiscordEmbed EmbedBuilder()
         {
             var messageBuilder = new StringBuilder();
 
@@ -58,36 +55,18 @@ namespace Slorp.Modules
                 string mod = string.Empty;
                 int moddedTotal = _dSets[i].dResult.Total + _dSets[i].Modifier;
 
-                // Sets mod string if mod != 0
-                if (_dSets[i].Modifier == 0) mod = "";
-                else if (_dSets[i].Modifier > 0) mod = $"+{_dSets[i].Modifier.ToString()}";
-                else mod = _dSets[i].Modifier.ToString();
+                // Converts modifier int to string if mod != 0
+                if (_dSets[i].Modifier == 0)
+                    mod = string.Empty;
+                else if (_dSets[i].Modifier > 0)
+                    mod = $"+{_dSets[i].Modifier.ToString()}";
+                else
+                    mod = _dSets[i].Modifier.ToString();
 
-                messageBuilder.Append("("); // Start-of-set bracket
+                messageBuilder.Append(GetSetResults(i));
 
-                // Adds each roll to messageBuilder, with a comma if theres another roll to add
-                for (int j = 0; j < _dSets[i].dResult.results.Count; j++)
-                {
-                    if (j + 1 < _dSets[i].dResult.results.Count)
-                    {
-                        messageBuilder.Append(_dSets[i].dResult.results[j].Item2.ToString() + ", ");
-                    }
-                    else messageBuilder.Append(_dSets[i].dResult.results[j].Item2.ToString());
-                }
-
-                messageBuilder.Append(")"); // End-of-set bracket
-
-                messageBuilder.Append(mod + $"  Total: {moddedTotal}");
-
-                // if 1d20 is rolled, checks for critical success/failure.
-                if (_dSets[i].DiceNum == 1 && _dSets[i].DiceType == 20 && _dSets[i].dResult.Total == 20)
-                {
-                    messageBuilder.Append("  Critical success!");
-                }
-                else if (_dSets[i].DiceNum == 1 && _dSets[i].DiceType == 20 && _dSets[i].dResult.Total == 1)
-                {
-                    messageBuilder.Append("  Critical failure!");
-                }
+                // Adds total with modifier to messageBuilder
+                messageBuilder.Append(mod + $"\nTotal: {moddedTotal}");
 
                 messageBuilder.Append("\n");
             }
@@ -100,39 +79,65 @@ namespace Slorp.Modules
             };
             return embedBuilder.Build();
         }
+
+        private string GetSetResults(int i)
+        {
+            string _result = string.Empty;
+
+            // If there are multiple dice rolled in this set,
+            // - list all rolls with comma delimination if there's another roll to add
+            // - surround rolls with [square brackets] for easy reading
+            // Else add only the rolled value
+            if (_dSets[i].dResult.results.Count > 1)
+            {
+                _result += "[";
+
+                for (int j = 0; j < _dSets[i].dResult.results.Count; j++)
+                    _result += _dSets[i].dResult.results.Count > j + 1 ?
+                        _dSets[i].dResult.results[j].Item2.ToString() + ", " : _dSets[i].dResult.results[j].Item2.ToString();
+
+                _result += "]";
+            }
+            else
+                _result += _dSets[i].dResult.results[0].Item2.ToString();
+
+            // If 1d20 is rolled, checks for critical success/failure.
+            if (_dSets[i].DiceNum == 1 && _dSets[i].DiceType == 20 && _dSets[i].dResult.Total == 20)
+                _result += ("  Critical success!");
+            else if (_dSets[i].DiceNum == 1 && _dSets[i].DiceType == 20 && _dSets[i].dResult.Total == 1)
+                _result += ("  Critical failure!");
+
+            return _result;
+        }
     }
 
     class DSet
     {
-        private int _diceNum;
-        private int _diceType;
-        private int _modifier;
+        private int[] _rollSet = new int[3];
+
+        public int DiceNum { get => _rollSet[0]; }
+        public int DiceType { get => _rollSet[1]; }
+        public int Modifier { get => _rollSet[2]; }
 
         public Results dResult = new Results();
 
-        public int DiceNum { get => _diceNum; }
-        public int DiceType { get => _diceType; }
-        public int Modifier { get => _modifier; }
-
         private static readonly Random random = new Random();
 
-        public DSet(int diceNum, int diceType, int modifier)
+        public DSet(int[] diceSet)
         {
-            _diceNum = diceNum;
-            _diceType = diceType;
-            _modifier = modifier;
+            _rollSet = diceSet;
         }
 
         public void Roll()
         {
             int nRnd = 0;
             // Loops for each die
-            for (int i = 0; i < _diceNum; i++)
+            for (int i = 0; i < _rollSet[0]; i++)
             {
                 // Generates a random number between 1 and the number of sides of the die
-                nRnd = random.Next(1, _diceType + 1);
+                nRnd = random.Next(1, _rollSet[1] + 1);
                 // Adds the random number to the result list
-                dResult.results.Add(new Tuple<int, int>(_diceType, nRnd));
+                dResult.results.Add(new Tuple<int, int>(_rollSet[1], nRnd));
             }
         }
     }

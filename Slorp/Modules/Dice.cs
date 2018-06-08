@@ -55,7 +55,7 @@ namespace Slorp.Modules
                 string mod = string.Empty;
                 int moddedTotal = _dSets[i].dResult.Total + _dSets[i].Modifier;
 
-                // Sets mod string if mod != 0
+                // Converts modifier int to string if mod != 0
                 if (_dSets[i].Modifier == 0)
                     mod = string.Empty;
                 else if (_dSets[i].Modifier > 0)
@@ -65,7 +65,7 @@ namespace Slorp.Modules
 
                 messageBuilder.Append(GetSetResults(i));
 
-                messageBuilder.Append(mod + $"  Total: {moddedTotal}");
+                // Adds total with modifier to messageBuilder
                 messageBuilder.Append(mod + $"\nTotal: {moddedTotal}");
 
                 messageBuilder.Append("\n");
@@ -84,6 +84,10 @@ namespace Slorp.Modules
         {
             string _result = string.Empty;
 
+            // If there are multiple dice rolled in this set,
+            // - list all rolls with comma delimination if there's another roll to add
+            // - surround rolls with [square brackets] for easy reading
+            // Else add only the rolled value
             if (_dSets[i].dResult.results.Count > 1)
             {
                 _result += "[";

@@ -14,6 +14,7 @@ namespace Slorp.Core {
     public class Program {
         public DiscordClient Client { get; set; }
         public CommandsNextModule Commands { get; set; }
+        ConfigJson cfgjson;
 
         static void Main(string[] args) => new Program().RunBotAsync().GetAwaiter().GetResult();
 
@@ -25,7 +26,7 @@ namespace Slorp.Core {
                 json = await sr.ReadToEndAsync();
 
             // Load the values from config file
-            var cfgjson = JsonConvert.DeserializeObject<ConfigJson>(json);
+            cfgjson = JsonConvert.DeserializeObject<ConfigJson>(json);
             var cfg = new DiscordConfiguration {
                 Token = cfgjson.Token,
                 TokenType = TokenType.Bot,
@@ -43,6 +44,16 @@ namespace Slorp.Core {
             Client.GuildAvailable += Client_GuildAvailable;
             Client.ClientErrored += Client_ClientError;
 
+            LoadCommands();
+
+            // Connect and log in
+            await Client.ConnectAsync();
+
+            // Infinite wait
+            await Task.Delay(-1);
+        }
+
+        private void LoadCommands() {
             // Set up command options
             var cmdcfg = new CommandsNextConfiguration
             {
@@ -67,12 +78,6 @@ namespace Slorp.Core {
             Commands.RegisterCommands<CoreCommands>();
             Commands.RegisterCommands<ModCommands>();
             Commands.RegisterCommands<AdminCommands>();
-
-            // Connect and log in
-            await Client.ConnectAsync();
-
-            // Infinite wait
-            await Task.Delay(-1);
         }
 
         private Task Client_Ready(ReadyEventArgs e) {

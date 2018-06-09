@@ -6,22 +6,21 @@ using System.Threading.Tasks;
 
 namespace Slorp.Commands {
     [Group("admin")]
-    [Description("Administrative commands.")]
+    [Description("Administrative spellbook")]
     [RequirePermissions(Permissions.Administrator)]
     [Hidden]
     public class AdminCommands {
         // Commands in this class need to be executed as <prefix>admin <command> <arguments>
 
         [Command("Sudo")]
-        [Description("Executes a command as another user.")]
+        [Description("Speak or cast a spell as another user.")]
         public async Task Sudo(CommandContext ctx,
-            [Description("Member to execute as.")] DiscordMember member,
-            [RemainingText, Description("Command text to execute.")] string command
+            [Description("Member to impersonate.")] DiscordMember member,
+            [RemainingText, Description(".")] string command
             ) {
-            // the [RemainingText] attribute in the argument captures all text passed to the command
             await ctx.TriggerTypingAsync();
 
-            // Gets the command service, needed for sudo purposes
+            // Gets the command service, needed to call sudo
             var cmds = ctx.CommandsNext;
 
             // Performs the sudo

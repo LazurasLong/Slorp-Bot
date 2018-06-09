@@ -11,7 +11,7 @@ namespace Slorp.Commands {
     [RequirePermissions(Permissions.ManageMessages)]
     [Hidden]
     public class ModCommands {
-        [Command("clear")]
+        [Command("Clear")]
         [Description("Clears messages from the chat")]
         public async Task Clear(CommandContext ctx,
             [Description("Number of messages to delete")]int number,

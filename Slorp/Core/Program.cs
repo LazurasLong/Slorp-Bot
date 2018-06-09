@@ -44,8 +44,7 @@ namespace Slorp.Core {
             Client.ClientErrored += Client_ClientError;
 
             // Set up command options
-            var cmdcfg = new CommandsNextConfiguration
-            {
+            var cmdcfg = new CommandsNextConfiguration {
                 // Sets the prefix from the loaded file
                 StringPrefix = cfgjson.CommandPrefix,
 

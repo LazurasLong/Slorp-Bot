@@ -63,11 +63,6 @@ namespace Slorp.Core {
             Commands.CommandExecuted += Commands_CommandExecuted;
             Commands.CommandErrored += Commands_CommandErrored;
 
-            // Add a converter for a custom type and a name
-            //var mathopcvt = new MathOperationConverter();
-            //CommandsNextUtilities.RegisterConverter(mathopcvt);
-            //CommandsNextUtilities.RegisterUserFriendlyTypeName<MathOperation>("operation");
-
             // Register commands
             Commands.RegisterCommands<CoreCommands>();
             Commands.RegisterCommands<ModCommands>();

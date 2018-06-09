@@ -9,9 +9,9 @@ namespace Slorp.Commands {
     public class CoreCommands {
         DiscordColor slorpColor = new DiscordColor("#ffd28b");
 
-        [Command("ping")]
+        [Command("Ping")]
         [Description("Measures Slorp's latency")]
-        [Aliases("pong")]
+        [Aliases("Pong")]
         public async Task Ping(CommandContext ctx) // CommandContext is context the command came from (User, Channel, Server)
         {
             // triggers a typing indicator in the channel the command came from
@@ -24,7 +24,7 @@ namespace Slorp.Commands {
             await ctx.RespondAsync($"{emoji} Pong! {ctx.Client.Ping}ms");
         }
 
-        [Command("roll")]
+        [Command("Roll")]
         [Description("Rolls sets of dice")]
         [Aliases("r")]
         public async Task Roll(CommandContext ctx, [RemainingText] string _dice) {
@@ -35,7 +35,7 @@ namespace Slorp.Commands {
             await ctx.RespondAsync(embed: dice.DRoll(_dice));
         }
 
-        [Command("rip")]
+        [Command("RIP")]
         [Description("Pay your respects")]
         [Aliases("f")]
         public async Task Rip(

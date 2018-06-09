@@ -63,7 +63,10 @@ namespace Slorp.Core {
                 EnableDms = true,
 
                 // Lets users mention the bot instead of using a prefix
-                EnableMentionPrefix = true
+                EnableMentionPrefix = true,
+                
+                // Stops commands from being case sensitive
+                CaseSensitive = false
             };
 
             // Load commands from command class

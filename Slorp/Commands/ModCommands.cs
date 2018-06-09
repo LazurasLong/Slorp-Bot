@@ -11,22 +11,26 @@ namespace Slorp.Commands {
     [RequirePermissions(Permissions.ManageMessages)]
     [Hidden]
     public class ModCommands {
-        [Command("clear")]
+        [Command("Clear")]
         [Description("Clears messages from the chat")]
-        public async Task Clear(CommandContext ctx, int number, DiscordMember user = null) {
+        public async Task Clear(CommandContext ctx,
+            [Description("Number of messages to delete")]int number,
+            [Description("[Optional] Mention a user to only delete their messages")] DiscordMember user = null,
+            [Description("[Optional] Give an optional reason for deleting these messages"), RemainingText] string reason = null) {
+
+            List<DiscordMessage> messageList = new List<DiscordMessage>();
+
             if (user == null) {
-                // If no user is specified, deletes the last <number> messages
-                IEnumerable<DiscordMessage> messageList = await ctx.Channel.GetMessagesAsync(number, ctx.Message.Id) as IEnumerable<DiscordMessage>;
-                await ctx.Channel.DeleteMessagesAsync(messageList);
+                // If no user is specified, retrieves the last <number> messages and stores in a list
+                messageList.AddRange(await ctx.Channel.GetMessagesAsync(number, ctx.Message.Id));
             }
             else {
                 // Grabs the message that triggered the command
                 DiscordMessage message = ctx.Message;
-                // Creates an empty list to store messages to be deleted
-                List<DiscordMessage> messageList = new List<DiscordMessage>();
 
                 for (int i = 0; i < number;) {
-                    // Grabs the message immediately before <message>, stored in an array
+                    // Retrieves an IEnumerable<DiscordMessage> with the message directly before the previously checked message.
+                    // The first time this loop runs, <message> is the message that triggered the clear command.
                     var testMessage = await ctx.Channel.GetMessagesAsync(1, message.Id);
                     message = testMessage[0];
 
@@ -36,12 +40,10 @@ namespace Slorp.Commands {
                         i++;
                     }
                 }
-
-                await ctx.Channel.DeleteMessagesAsync(messageList as IEnumerable<DiscordMessage>);
             }
-
-            // Deletes the message that triggered this command
-            await ctx.Message.DeleteAsync("Clearing command clutter");
+            // Adds the message that invoked the command to the list of messages to be deleted, then deletes all messages in the list.
+            messageList.Add(ctx.Message);
+            await ctx.Channel.DeleteMessagesAsync(messageList as IEnumerable<DiscordMessage>, reason);
         }
     }
 }

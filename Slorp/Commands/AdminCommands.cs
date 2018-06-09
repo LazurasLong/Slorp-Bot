@@ -12,7 +12,7 @@ namespace Slorp.Commands {
     public class AdminCommands {
         // Commands in this class need to be executed as <prefix>admin <command> <arguments>
 
-        [Command("sudo")]
+        [Command("Sudo")]
         [Description("Executes a command as another user.")]
         public async Task Sudo(CommandContext ctx,
             [Description("Member to execute as.")] DiscordMember member,

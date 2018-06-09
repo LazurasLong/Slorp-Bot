@@ -5,6 +5,7 @@ using DSharpPlus.Entities;
 using DSharpPlus.EventArgs;
 using Newtonsoft.Json;
 using Slorp.Commands;
+using Slorp.Modules;
 using System;
 using System.IO;
 using System.Text;
@@ -80,6 +81,9 @@ namespace Slorp.Core {
             Commands.RegisterCommands<CoreCommands>();
             Commands.RegisterCommands<ModCommands>();
             Commands.RegisterCommands<AdminCommands>();
+
+            // Link help formatter
+            Commands.SetHelpFormatter<HelpFormatter>();
         }
 
         private Task Client_Ready(ReadyEventArgs e) {

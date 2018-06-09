@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Slorp.Commands {
     [Group("mod")]
-    [Description("Moderator commands")]
+    [Description("Moderator spellbook")]
     [RequirePermissions(Permissions.ManageMessages)]
     [Hidden]
     public class ModCommands {

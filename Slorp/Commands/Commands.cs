@@ -31,9 +31,8 @@ namespace Slorp.Commands {
             await ctx.TriggerTypingAsync();
 
             Dice dice = new Dice();
-            var embed = new DiscordEmbedBuilder(dice.DRoll(_dice));
 
-            await ctx.RespondAsync(embed: embed.Build());
+            await ctx.RespondAsync(embed: dice.DRoll(_dice));
         }
 
         [Command("rip")]

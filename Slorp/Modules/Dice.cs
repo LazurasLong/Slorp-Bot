@@ -5,16 +5,13 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Slorp.Modules
-{
-    public class Dice
-    {
+namespace Slorp.Modules {
+    public class Dice {
         private string _input;
         private List<DSet> _dSets = new List<DSet>();
         private List<string> results = new List<string>();
 
-        public DiscordEmbed DRoll(string input)
-        {
+        public DiscordEmbed DRoll(string input) {
             _input = input;
             ValidateInput();
             Run();
@@ -22,11 +19,9 @@ namespace Slorp.Modules
             return EmbedBuilder();
         }
 
-        private void ValidateInput()
-        {
+        private void ValidateInput() {
             string[] sets = _input.Split(';');
-            foreach (string set in sets)
-            {
+            foreach (string set in sets) {
                 int[] diceSet = new int[3];
                 Match RegexMatch = Regex.Match(set, @"^(\d+)d(\d+)(-?\+?\d+)?$");
 
@@ -38,20 +33,17 @@ namespace Slorp.Modules
             }
         }
 
-        private void Run()
-        {
+        private void Run() {
             foreach (var d in _dSets) d.Roll();
 
             for (int i = 0; i < _dSets.Count; i++)
                 results.Add(_dSets[i].dResult.Total.ToString());
         }
 
-        private DiscordEmbed EmbedBuilder()
-        {
+        private DiscordEmbed EmbedBuilder() {
             var messageBuilder = new StringBuilder();
 
-            for (int i = 0; i < results.Count; i++)
-            {
+            for (int i = 0; i < results.Count; i++) {
                 string mod = string.Empty;
                 int moddedTotal = _dSets[i].dResult.Total + _dSets[i].Modifier;
 
@@ -71,8 +63,7 @@ namespace Slorp.Modules
                 messageBuilder.Append("\n");
             }
 
-            var embedBuilder = new DiscordEmbedBuilder
-            {
+            var embedBuilder = new DiscordEmbedBuilder {
                 Color = new DiscordColor("#ea596e"),
                 Title = results.Count == 1 ? $"Your roll :game_die:" : $"Your rolls :game_die:",
                 Description = messageBuilder.ToString().Replace("\r\n", "\n"),
@@ -80,16 +71,14 @@ namespace Slorp.Modules
             return embedBuilder.Build();
         }
 
-        private string GetSetResults(int i)
-        {
+        private string GetSetResults(int i) {
             string _result = string.Empty;
 
             // If there are multiple dice rolled in this set,
             // - list all rolls with comma delimination if there's another roll to add
             // - surround rolls with [square brackets] for easy reading
             // Else add only the rolled value
-            if (_dSets[i].dResult.results.Count > 1)
-            {
+            if (_dSets[i].dResult.results.Count > 1) {
                 _result += "[";
 
                 for (int j = 0; j < _dSets[i].dResult.results.Count; j++)
@@ -111,8 +100,7 @@ namespace Slorp.Modules
         }
     }
 
-    class DSet
-    {
+    class DSet {
         private int[] _rollSet = new int[3];
 
         public int DiceNum { get => _rollSet[0]; }
@@ -123,17 +111,14 @@ namespace Slorp.Modules
 
         private static readonly Random random = new Random();
 
-        public DSet(int[] diceSet)
-        {
+        public DSet(int[] diceSet) {
             _rollSet = diceSet;
         }
 
-        public void Roll()
-        {
+        public void Roll() {
             int nRnd = 0;
             // Loops for each die
-            for (int i = 0; i < _rollSet[0]; i++)
-            {
+            for (int i = 0; i < _rollSet[0]; i++) {
                 // Generates a random number between 1 and the number of sides of the die
                 nRnd = random.Next(1, _rollSet[1] + 1);
                 // Adds the random number to the result list
@@ -142,8 +127,7 @@ namespace Slorp.Modules
         }
     }
 
-    class Results
-    {
+    class Results {
         public List<Tuple<int, int>> results = new List<Tuple<int, int>>();
         public int Total => results.Sum(x => x.Item2);
     }

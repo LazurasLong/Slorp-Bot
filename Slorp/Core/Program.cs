@@ -10,17 +10,14 @@ using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Slorp.Core
-{
-    public class Program
-    {
+namespace Slorp.Core {
+    public class Program {
         public DiscordClient Client { get; set; }
         public CommandsNextModule Commands { get; set; }
 
         static void Main(string[] args) => new Program().RunBotAsync().GetAwaiter().GetResult();
 
-        public async Task RunBotAsync()
-        {
+        public async Task RunBotAsync() {
             // Load Configuration File
             var json = "";
             using (var fs = File.OpenRead("config.json"))
@@ -29,8 +26,7 @@ namespace Slorp.Core
 
             // Load the values from config file
             var cfgjson = JsonConvert.DeserializeObject<ConfigJson>(json);
-            var cfg = new DiscordConfiguration
-            {
+            var cfg = new DiscordConfiguration {
                 Token = cfgjson.Token,
                 TokenType = TokenType.Bot,
 
@@ -84,8 +80,7 @@ namespace Slorp.Core
             await Task.Delay(-1);
         }
 
-        private Task Client_Ready(ReadyEventArgs e)
-        {
+        private Task Client_Ready(ReadyEventArgs e) {
             // Log a message when client is ready to process events
             e.Client.DebugLogger.LogMessage(LogLevel.Info, "Slorp", "Client is ready to process events.", DateTime.Now);
 
@@ -95,43 +90,37 @@ namespace Slorp.Core
             return Task.CompletedTask;
         }
 
-        private Task Client_GuildAvailable(GuildCreateEventArgs e)
-        {
+        private Task Client_GuildAvailable(GuildCreateEventArgs e) {
             // Log the name of the guild that was sent to the client
             e.Client.DebugLogger.LogMessage(LogLevel.Info, "Slorp", $"Guild available: {e.Guild.Name}", DateTime.Now);
 
             return Task.CompletedTask;
         }
 
-        private Task Client_ClientError(ClientErrorEventArgs e)
-        {
+        private Task Client_ClientError(ClientErrorEventArgs e) {
             // Log the details of the error that occurred in the client
             e.Client.DebugLogger.LogMessage(LogLevel.Error, "Slorp", $"Exception occured: {e.Exception.GetType()}: {e.Exception.Message}", DateTime.Now);
 
             return Task.CompletedTask;
         }
 
-        private Task Commands_CommandExecuted(CommandExecutionEventArgs e)
-        {
+        private Task Commands_CommandExecuted(CommandExecutionEventArgs e) {
             // Log name of the command and user
             e.Context.Client.DebugLogger.LogMessage(LogLevel.Info, "Slorp", $"{e.Context.User.Username} Successfully executed '{e.Command.QualifiedName}'", DateTime.Now);
 
             return Task.CompletedTask;
         }
 
-        private async Task Commands_CommandErrored(CommandErrorEventArgs e)
-        {
+        private async Task Commands_CommandErrored(CommandErrorEventArgs e) {
             // Log error details
             e.Context.Client.DebugLogger.LogMessage(LogLevel.Error, "Slorp", $"{e.Context.User.Username} tried executing '{e.Command?.QualifiedName ?? "<unknown command>"}' but it errored: {e.Exception.GetType()}: {e.Exception.Message ?? "<no message>"}", DateTime.Now);
 
             // Does the user have the right permissions?
-            if (e.Exception is ChecksFailedException ex)
-            {
+            if (e.Exception is ChecksFailedException ex) {
                 // No, they don't have the right permissions. Let them know.
                 var emoji = DiscordEmoji.FromName(e.Context.Client, ":no_entry:");
 
-                var embed = new DiscordEmbedBuilder
-                {
+                var embed = new DiscordEmbedBuilder {
                     Title = "Access denied",
                     Description = $"{emoji} You do not have the permissions required to execute this command.",
                     Color = DiscordColor.DarkRed
@@ -142,8 +131,7 @@ namespace Slorp.Core
 
     }
 
-    public struct ConfigJson
-    {
+    public struct ConfigJson {
         [JsonProperty("token")]
         public string Token { get; private set; }
 

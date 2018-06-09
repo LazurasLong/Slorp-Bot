@@ -5,10 +5,8 @@ using Slorp.Modules;
 using System.Threading.Tasks;
 
 
-namespace Slorp.Commands
-{
-    public class CoreCommands
-    {
+namespace Slorp.Commands {
+    public class CoreCommands {
         DiscordColor slorpColor = new DiscordColor("#ffd28b");
 
         [Command("ping")]
@@ -29,8 +27,7 @@ namespace Slorp.Commands
         [Command("roll")]
         [Description("Rolls sets of dice")]
         [Aliases("r")]
-        public async Task Roll(CommandContext ctx, [RemainingText] string _dice)
-        {
+        public async Task Roll(CommandContext ctx, [RemainingText] string _dice) {
             await ctx.TriggerTypingAsync();
 
             Dice dice = new Dice();
@@ -46,12 +43,10 @@ namespace Slorp.Commands
             CommandContext ctx,
             [Description("Member who died, can be a nickname or a @mention")] DiscordMember member,
             [RemainingText, Description("Leave an epitaph?")] string message = ""
-            )
-        {
+            ) {
             await ctx.TriggerTypingAsync();
 
-            var embed = new DiscordEmbedBuilder
-            {
+            var embed = new DiscordEmbedBuilder {
                 Title = $":skull: {member.DisplayName} died :skull:",
                 Description = $"Here lies {member.Mention}",
                 Color = slorpColor

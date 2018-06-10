@@ -55,7 +55,7 @@ namespace Slorp.Modules {
 
         // This is called sixth, it adds the group's subcommands if a group is specified with the help function
         public IHelpFormatter WithSubcommands(IEnumerable<Command> subcommands) {
-            HelpEmbed.AddField("Spells", "```" + string.Join("\n", subcommands.Select(xc => xc.Name)) + "```");
+            HelpEmbed.AddField("Spells", "```\n" + string.Join("\n", subcommands.Select(xc => xc.Name)) + "```");
 
             return this;
         }
